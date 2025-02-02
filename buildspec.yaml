@@ -1,39 +1,32 @@
 version: 0.2
 
-artifacts:
-  files:
-    - '**/*'
-  base-directory: '.'
-
 phases:
   install:
     runtime-versions:
       python: 3.9
     commands:
-      - echo Installing Terraform
       - yum install -y yum-utils
       - yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
       - yum -y install terraform
-      - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID" --profile "$profile_name"
-      - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY" --profile "$profile_name"
-      - aws configure set region "$REGION" --profile "$profile_name"
+      - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      - aws configure set region $REGION
 
   pre_build:
     commands:
       - terraform version
-      - echo Verifying Terraform installation
-      - echo verifying caller identity
       - aws sts get-caller-identity
 
   build:
     commands:
-      - echo Starting deployment of infrastructure
-      - pwd
-      - ls -la
       - terraform init -backend-config="key=prod/terraform.tfstate"
-      - terraform plan -var-file=prod.terraform.tfvars
       - terraform apply -var-file=prod.terraform.tfvars --auto-approve
 
   post_build:
     commands:
-      - echo Terraform apply completed on `date`
+      - echo Build completed
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: '.'
