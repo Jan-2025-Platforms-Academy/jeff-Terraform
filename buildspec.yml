@@ -20,7 +20,7 @@ phases:
   build:
     commands:
       - terraform init -backend-config="key=prod/terraform.tfstate"
-      - terraform apply -var-file=prod.terraform.tfvars --auto-approve -lock=false
+      - terraform apply -var-file=prod.terraform.tfvars --auto-approve
 
   post_build:
     commands:
